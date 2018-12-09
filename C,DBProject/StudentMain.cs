@@ -1,13 +1,6 @@
 ﻿using MySql.Data.MySqlClient;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Configuration;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace C_DBProject
@@ -15,6 +8,7 @@ namespace C_DBProject
     public partial class StudentMain : Form
     {
         private string strSql = ConfigurationManager.AppSettings["DBconn"];
+        string stuId = string.Empty;
 
         public StudentMain()
         {
@@ -23,8 +17,13 @@ namespace C_DBProject
 
         private void viewPointBtn_Click(object sender, EventArgs e)
         {
-            ViewPoint vp = new ViewPoint();
+            ViewPoint vp = new ViewPoint(this.stuId);
             vp.ShowDialog();
+        }
+
+        private void LoginComplet()
+        {
+
         }
 
         private void applySubMinusPointBtn_Click(object sender, EventArgs e)

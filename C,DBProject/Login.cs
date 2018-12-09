@@ -1,19 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using MySql.Data.MySqlClient;
 using System.Configuration;
 
 namespace C_DBProject
-{
+{    
     public partial class Login : Form
     {
+        public delegate void LoginCompletHandler(string Id);
+        public event LoginCompletHandler LoginComplet;
+
         private string strSql = ConfigurationManager.AppSettings["DBconn"];
         HashConvert hc = new HashConvert();
 
@@ -60,18 +56,24 @@ namespace C_DBProject
 
             try
             {
-                var Comm = new MySqlCommand("select id, pw from student where id='" + this.txtstuId.Text + "'", Conn);
+                var Comm = new MySqlCommand("select id, pw, stuId from student where id='" + this.txtstuId.Text + "'", Conn);
                 var MyRead = Comm.ExecuteReader();
 
                 while (MyRead.Read())
                 {
                     String id = MyRead.GetString(0);
                     String pw = MyRead.GetString(1);
+                    String sId = MyRead.GetString(2);
 
                     if (this.txtstuId.Text == id)
                     {
                         if (hc.ConvertSha256(this.txtstuPw.Text) == pw)
                         {
+                            //LoginComplet(txttcId.Text);
+
+                            txtstuId.Text = "";
+                            txtstuPw.Text = "";
+
                             MyRead.Close();
                             Conn.Close();
                             return true;
@@ -125,6 +127,9 @@ namespace C_DBProject
                         {
                             MyRead.Close();
                             Conn.Close();
+
+                            txttcId.Text = "";
+                            txttcPw.Text = "";
                             return true;
                         }
                     }

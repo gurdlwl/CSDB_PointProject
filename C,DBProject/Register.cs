@@ -78,9 +78,37 @@ namespace C_DBProject
 
             return true;
         }
+
+        private bool CheckStuId()
+        {
+            var Conn = new MySqlConnection(strSql);
+            Conn.Open();
+
+            var Comm = new MySqlCommand("select * from student where stuId = '" + this.txtstuId.Text + "'", Conn);
+            var MyRead = Comm.ExecuteReader();
+
+            while (MyRead.Read())
+            {
+                MessageBox.Show("동일한 학번이 존재합니다.", "알림", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                this.txtstuId.Text = "";
+                this.txtstuId.Focus();
+
+                MyRead.Close();
+                Conn.Close();
+                return false;
+            }
+
+            MyRead.Close();
+            Conn.Close();
+
+            return true;
+        }
+
         private void btnRegister_Click(object sender, EventArgs e)
         {
             double number = 0;
+            
             if (TxtCheck() == true)
             {
                 if (this.txtPw.Text != this.txtPwCheck.Text)
@@ -94,30 +122,35 @@ namespace C_DBProject
                 }
                 else
                 {
-                    if (CheckId() == true)
+                    if(CheckStuId() == true)
                     {
-                        var Conn = new MySqlConnection(strSql);
-                        Conn.Open();
-
-                        String Sql = "insert into student(stuId, stuName, id, pw)";
-                        Sql += " values('" + this.txtstuId.Text + "', '" + this.txtstuName.Text + "', '" + this.txtId.Text
-                            + "', '" + hc.ConvertSha256(this.txtPw.Text) + "');";
-
-                        var Comm = new MySqlCommand(Sql, Conn);
-                        int i = Comm.ExecuteNonQuery();
-
-                        if (i == 1)
+                        if (CheckId() == true)
                         {
-                            MessageBox.Show("정상적으로 회원가입이 되었습니다.", "알림", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                            this.Close();
-                        }
+                            var Conn = new MySqlConnection(strSql);
+                            Conn.Open();
 
-                        else
-                        {
-                            MessageBox.Show("회원가입에 실패하였습니다.", "알림", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            String Sql = "insert into student(stuId, stuName, id, pw)";
+                            Sql += " values('" + this.txtstuId.Text + "', '" + this.txtstuName.Text + "', '" + this.txtId.Text
+                                + "', '" + hc.ConvertSha256(this.txtPw.Text) + "');";
+
+                            var Comm = new MySqlCommand(Sql, Conn);
+                            int i = Comm.ExecuteNonQuery();
+
+                            if (i == 1)
+                            {
+                                MessageBox.Show("정상적으로 회원가입이 되었습니다.", "알림", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                this.Close();
+                            }
+
+                            else
+                            {
+                                MessageBox.Show("회원가입에 실패하였습니다.", "알림", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            }
+                            Conn.Close();
                         }
-                        Conn.Close();
                     }
+
+                    
                 }
             }
         }
